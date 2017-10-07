@@ -24,7 +24,7 @@ class User extends REST_Controller
 	}
 
 
-	function index_get($id=null){	
+	function index_get($group_user=null,$id=null){	
 		
 		#Set response API if Success
 		$response['SUCCESS'] = array('status' => TRUE, 'message' => 'success get user' , 'data' => null );
@@ -35,16 +35,22 @@ class User extends REST_Controller
 		#
 		if (!empty($this->get('ID_USER')))
 			$id=$this->get('ID_USER');
+
+
+		#
+		if (!empty($this->get('GROUP_USER')))
+			$group_user=$this->get('GROUP_USER');
         
 
-		if ($id==null) {
+
+		if ($id==null||$id==0) {
 			#Call methode get_all from m_users model
-			$users=$this->m_users->get_all();
+			$users=$this->m_users->get_all($group_user);
 		
 		}
 
 
-		if ($id!=null) {
+		if ($id!=null&&$id!=0) {
 			
 			#Check if id <= 0
 			if ($id<=0) {

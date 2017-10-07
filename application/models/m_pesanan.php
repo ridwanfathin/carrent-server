@@ -4,19 +4,22 @@
 /**
 * 
 */
-class m_users extends CI_Model
+class m_pesanan extends CI_Model
 {
 	
-	private $table_name = "tb_users";
+	private $table_name 	= "tb_transaksi";
+	private $table_detail 	= "tb_detail_transaksi";
+	private $table_user		= "tb_users";
+	private $primary 		= "KODE_TRANSAKSI";
 
-	private $primary = "ID_USER";
-
-	function get_all($group_user){
+	function get_all(){
 
 		#Get all data users
-		$this->db->where("GROUP_USER",$group_user);
-		$data=$this->db->get($this->table_name);
+		$this->db->select("t_tran.*,t_user.NAME");
+		$data=$this->db->join($this->table_user." t_user","t_user.ID_USER=t_tran.ID_USER");
+		$data=$this->db->get($this->table_name." t_tran");
 		return $data->result();
+
 
 	}
 
