@@ -88,7 +88,7 @@ class Mobil extends REST_Controller
 							'KAPASITAS_MOBIL' => $this->post('KAPASITAS_MOBIL') ,
 							'HARGA_MOBIL' => $this->post('HARGA_MOBIL') ,
 							'WARNA_MOBIL' => $this->post('WARNA_MOBIL') ,
-							'BENSIN_MOBIL' => $this->post('BENSIN_MOBIL') ,
+							'BENSIN_MOBIL' => 1 ,
 							'PLAT_NO_MOBIL' =>$this->post('PLAT_NO_MOBIL'),
 							'STATUS_SEWA'=>0,
 							'STATUS_MOBIL'=>$this->post('STATUS_MOBIL'),
@@ -99,10 +99,14 @@ class Mobil extends REST_Controller
 		#Initialize image name
 		$image_name=round(microtime(true)).date("Ymdhis").".jpg";
 
+		$mobil_photo=null;
+
 		#Upload avatar
-		if ($this->Upload_Images($image_name))
-			$mobil_data['PHOTO']=$image_name;
-	
+		if ($this->Upload_Images($image_name)){
+			$mobil_photo['IMAGE']=$image_name;
+			$mobil_photo['ID_MOBIL']=$image_name;
+		}
+		
 		#Set response API if Success
 		$response['SUCCESS'] = array('status' => TRUE, 'message' => 'Success insert data' , 'data' => $mobil_data );
 
@@ -119,7 +123,7 @@ class Mobil extends REST_Controller
 		}
 
 		#Check if insert mobil_data Success
-		$id=$this->m_mobil->insert($mobil_data);
+		$id=$this->m_mobil->insert($mobil_data,$mobil_photo);
 		if ($id) {
 			$mobil_data["ID_MOBIL"]=$id;
 			$response['SUCCESS'] = array('status' => TRUE, 'message' => 'Success insert data' , 'data' => $mobil_data );
@@ -242,7 +246,7 @@ class Mobil extends REST_Controller
 							
 				if($img != false)
 				{
-				   if (imagejpeg($img, './upload/avatars/'.$name)) {
+				   if (imagejpeg($img, './upload/mobil/'.$name)) {
 				   	return true;
 				   }else{
 				   	return false;
@@ -252,7 +256,7 @@ class Mobil extends REST_Controller
 	}
 
 	function remove_image($name){
-		$path='./upload/avatars/'.$name;
+		$path='./upload/mobil/'.$name;
 		unlink($path);
 	}
 

@@ -60,6 +60,9 @@ class m_users extends CI_Model
 		#Update data user by id
 		$this->db->where($this->primary,$id);
 		$update=$this->db->update($this->table_name,$data);
+		if ($update) {
+			$update=$this->get_by_id($id);
+		}
 
 		return $update;
 	}

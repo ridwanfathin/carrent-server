@@ -184,11 +184,21 @@ class User extends REST_Controller
 							'NO_TELP' => $this->put('NO_TELP') ,
 							'JENIS_KELAMIN' => $this->put('JENIS_KELAMIN') ,
 							'ALAMAT' => $this->put('ALAMAT') ,
-							'PASSWORD' => md5($this->put('PASSWORD')) ,
 							'ACTIVATED' => $this->put('ACTIVATED') ,
 							'LAST_UPDATE' =>date('Y-m-d h:i:s'),
 							'GROUP_USER'=>$this->put('GROUP_USER'),
 						);
+		if ($this->put('PASSWORD')) {
+			$user_data['PASSWORD'] = md5($this->put('PASSWORD'));
+		}
+
+		#Initialize image name
+		$image_name=round(microtime(true)).date("Ymdhis").".jpg";
+
+		#Upload avatar
+		if ($this->Upload_Images($image_name))
+			$user_data['PHOTO']=$image_name;
+
 
 		#Set response API if Success
 		$response['SUCCESS'] = array('status' => TRUE, 'message' => 'success update user' , 'data' => $user_data );
@@ -209,9 +219,10 @@ class User extends REST_Controller
 		
 		if ($this->m_users->get_by_username_email($this->put('USERNAME'),$this->put('EMAIL'))->ID_USER!=null&&$this->m_users->get_by_username_email($this->put('USERNAME'),$this->put('EMAIL'))->ID_USER!=$id)
 			$this->response($response['EXIST'],REST_Controller::HTTP_FORBIDDEN);
-
-		if ($this->m_users->update($id,$user_data)) {
+		$up=$this->m_users->update($id,$user_data);
+		if ($up) {
 			
+			$response['SUCCESS'] = array('status' => TRUE, 'message' => 'success update user' , 'data' => $up );			
 			#If success
 			$this->response($response['SUCCESS'],REST_Controller::HTTP_CREATED);
 		
@@ -235,7 +246,11 @@ class User extends REST_Controller
 	function Upload_Images($name) 
     {
 
-    		$strImage = str_replace('data:image/png;base64,', '', $this->post('PHOTO'));
+    		if ($this->post('PHOTO')) {
+	    		$strImage = str_replace('data:image/png;base64,', '', $this->post('PHOTO'));			
+    		}else{
+    			$strImage = str_replace('data:image/png;base64,', '', $this->put('PHOTO'));
+    		}
     		if (!empty($strImage)) {
     			$img = imagecreatefromstring(base64_decode($strImage));
 							
@@ -249,6 +264,7 @@ class User extends REST_Controller
 				}
 			}
 	}
+
 
 	function remove_image($name){
 		$path='./upload/avatars/'.$name;

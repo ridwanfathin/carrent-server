@@ -24,9 +24,16 @@ class m_mobil extends CI_Model
 		return $this->db->get($this->table_name)->row();
 	}
 
-	function insert($data){
+	function insert($data,$mobil_photo=null){
 		$insert=$this->db->insert($this->table_name,$data);
-		return $this->db->insert_id();
+		$id=$this->db->insert_id();
+
+		if ($mobil_photo!=null&&$id) {
+			$mobil_photo["ID_MOBIL"]=$id;
+			$insert=$this->db->insert($this->table_gallery,$mobil_photo);
+		}
+	
+		return $id;
 	}
 
 	function update($id,$data){
