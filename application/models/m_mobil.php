@@ -36,9 +36,16 @@ class m_mobil extends CI_Model
 		return $id;
 	}
 
-	function update($id,$data){
+	function update($id,$data,$mobil_photo=null){
 		$this->db->where($this->primary,$id);
 		$update=$this->db->update($this->table_name,$data);
+
+		if ($mobil_photo!=null&&$update) {
+			$mobil_photo["ID_MOBIL"]=$id;
+			$this->db->where($this->primary,$id);
+			$update=$this->db->update($this->table_gallery,$mobil_photo);
+		}
+	
 		return $update;
 	}
 

@@ -47,7 +47,7 @@ class m_pesanan extends CI_Model
 
 		#Insert data to table tb_users
 		$insert=$this->db->insert($this->table_name,$data);
-
+		// $this->db->insert_batch($this->table_detail,$param);
 		return $insert;
 	}
 
@@ -65,6 +65,11 @@ class m_pesanan extends CI_Model
 		$update=$this->db->update($this->table_name,$data);
 
 		return $update;
+	}
+
+	function get_kode_transaksi(){
+		$this->db->select("count('KODE_TRANSAKSI') AS KODE_TRANSAKSI");
+		return $this->db->get($this->table_name)->row();
 	}
 
 }

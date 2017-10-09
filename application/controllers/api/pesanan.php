@@ -77,17 +77,21 @@ class pesanan extends REST_Controller
 	}
 
 	function index_post(){
-				#
-		$pesanan_data = array('KODE_TRANSAKSI' =>$this->post('KODE_TRANSAKSI') , 
+		#
+		$kode=$this->m_pesanan->get_kode_transaksi();
+		$KODE_TRANSAKSI="TRN-".date("YmdHms")."-".$kode->KODE_TRANSAKSI;
+
+		$pesanan_data = array('KODE_TRANSAKSI' => $KODE_TRANSAKSI , 
 							'ID_USER' => $this->post('ID_USER') ,
 							'TGL_ORDER' => date("Y-m-d H:m:s") , 
 							'TOTAL_PEMBAYARAN' => $this->post('TOTAL_PEMBAYARAN') ,
-							'TGL_PEMBAYARAN' => $this->post('TGL_PEMBAYARAN') ,
-							'BUKTI_PEMBAYARAN' => $this->post('BUKTI_PEMBAYARAN') ,
-							'STATUS_PEMBAYARAN' => $this->post('STATUS_PEMBAYARAN') ,
-							'STATUS_TRANSAKSI' => $this->post('STATUS_TRANSAKSI') ,
+							'TGL_PEMBAYARAN' => null ,
+							'BUKTI_PEMBAYARAN' => null ,
+							'STATUS_PEMBAYARAN' => 0 ,
+							'STATUS_TRANSAKSI' => 0 ,
 						);
 
+		
 
 		#Set response API if Success
 		$response['SUCCESS'] = array('status' => TRUE, 'message' => 'success insert data' , 'data' => $pesanan_data );
