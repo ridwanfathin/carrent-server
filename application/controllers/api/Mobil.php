@@ -59,11 +59,15 @@ class Mobil extends REST_Controller
         # Check if the mobil data store contains mobil
 		if ($mobil) {
 			if (count($mobil)==1)
-				$mobil->IMAGE=explode(',', $mobil->IMAGE);
+				if (isset($mobil->IMAGE)) {
+					$mobil->IMAGE=explode(',', $mobil->IMAGE);
+				}else{
+					$mobil[0]->IMAGE=explode(',', $mobil[0]->IMAGE);
+				}
 			else
 				for ($i=0; $i <count($mobil) ; $i++)
 					$mobil[$i]->IMAGE=explode(',', $mobil[$i]->IMAGE);
-
+			// exit();
 			$response['SUCCESS']['data']=$mobil;
 
 			#if found mobil

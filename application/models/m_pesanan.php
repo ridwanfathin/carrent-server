@@ -10,6 +10,7 @@ class m_pesanan extends CI_Model
 	private $table_name 	= "tb_transaksi";
 	private $table_detail 	= "tb_detail_transaksi";
 	private $table_user		= "tb_users";
+	private $table_mobil	= "tb_mobil";
 	private $primary 		= "KODE_TRANSAKSI";
 
 	function get_all(){
@@ -32,6 +33,16 @@ class m_pesanan extends CI_Model
 		return $data->row();
 	}
 
+	function get_detail_by_id($id){
+
+		#Get data user by id
+		$this->db->where($this->primary,$id);
+		$this->db->join($this->table_mobil." t_mobil","t_mobil.ID_MOBIL=".$this->table_detail.".ID_MOBIL");
+		$data=$this->db->get($this->table_detail);
+
+		return $data->result();
+	}
+
 
 	function get_by_username_email($username,$email){		
 		#Get data by username or email
@@ -43,11 +54,11 @@ class m_pesanan extends CI_Model
 	}
 
 
-	function insert($data){
+	function insert($data,$detail_pesanan){
 
 		#Insert data to table tb_users
 		$insert=$this->db->insert($this->table_name,$data);
-		// $this->db->insert_batch($this->table_detail,$param);
+		$this->db->insert_batch($this->table_detail,$detail_pesanan);
 		return $insert;
 	}
 

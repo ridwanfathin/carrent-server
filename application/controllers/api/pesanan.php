@@ -23,7 +23,14 @@ class pesanan extends REST_Controller
 	}
 
 	function index_get($id=null){	
-		
+		// $as='[{"HARGA_MOBIL":"350000","ID_MOBIL":"2","MERK_MOBIL":"TOYOTA","NAMA_MOBIL":"Brio Satya E CVT","PLAT_NO_MOBIL":"D 0011 FZA","TGL_AKHIR_PENYEWAAN":"2017-11-29","TGL_SEWA":"2017-10-29","TOTAL":"11200000"},{"HARGA_MOBIL":"350000","ID_MOBIL":"15","MERK_MOBIL":"Datsun","NAMA_MOBIL":"Datsun Go","PLAT_NO_MOBIL":"D 1000 FX","TGL_AKHIR_PENYEWAAN":"2017-12-29","TGL_SEWA":"2017-10-29","TOTAL":"21700000"}]';
+		// foreach (json_decode($as,true) as $row) {
+		// 	echo $row["HARGA_MOBIL"];
+		// 	// var_dump($row);
+		// }
+		// // var_dump();
+
+		// exit();
 		#Set response API if Success
 		$response['SUCCESS'] = array('status' => TRUE, 'message' => 'Success get pesanan' , 'data' => null );
 		
@@ -41,16 +48,21 @@ class pesanan extends REST_Controller
 		
 		}
 
-
+		// var_dump($id);
+		// exit();
+		$id=str_replace("_", "-", $id);
+		// var_dump($id);
+		// exit();
 		if ($id!=null) {
-			
 			#Check if id <= 0
-			if ($id<=0) {
-				$this->response($response['NOT_FOUND'], REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
-			}
+			// if ($id<=0) {
+			// 	$this->response($response['NOT_FOUND'], REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
+			// }
 
 			#Call methode get_by_id from m_pesanan model
-			$pesanan=$this->m_pesanan->get_by_id($id);
+			$pesanan=$this->m_pesanan->get_detail_by_id($id);
+			// var_dump($pesanan);
+			// exit();
 		}
 
 
@@ -81,20 +93,43 @@ class pesanan extends REST_Controller
 		$kode=$this->m_pesanan->get_kode_transaksi();
 		$KODE_TRANSAKSI="TRN-".date("YmdHms")."-".$kode->KODE_TRANSAKSI;
 
+
 		$pesanan_data = array('KODE_TRANSAKSI' => $KODE_TRANSAKSI , 
 							'ID_USER' => $this->post('ID_USER') ,
 							'TGL_ORDER' => date("Y-m-d H:m:s") , 
 							'TOTAL_PEMBAYARAN' => $this->post('TOTAL_PEMBAYARAN') ,
 							'TGL_PEMBAYARAN' => null ,
-							'BUKTI_PEMBAYARAN' => null ,
+							'BUKTI_PEMBAYARAN' => null,
 							'STATUS_PEMBAYARAN' => 0 ,
 							'STATUS_TRANSAKSI' => 0 ,
 						);
 
+
+		// $as='[{"HARGA_MOBIL":"350000","ID_MOBIL":"2","MERK_MOBIL":"TOYOTA","NAMA_MOBIL":"Brio Satya E CVT","PLAT_NO_MOBIL":"D 0011 FZA","TGL_AKHIR_PENYEWAAN":"2017-11-29","TGL_SEWA":"2017-10-29","TOTAL":"11200000"},{"HARGA_MOBIL":"350000","ID_MOBIL":"15","MERK_MOBIL":"Datsun","NAMA_MOBIL":"Datsun Go","PLAT_NO_MOBIL":"D 1000 FX","TGL_AKHIR_PENYEWAAN":"2017-12-29","TGL_SEWA":"2017-10-29","TOTAL":"21700000"}]';
+
+		$detail_pesanan=array();
+		foreach (json_decode($this->post("LIST_CART"),true) as $row) {
+
+					$temp= array('KODE_TRANSAKSI' => $KODE_TRANSAKSI , 
+							'ID_MOBIL' => $row["ID_MOBIL"],
+							'TGL_SEWA' => $row["TGL_SEWA"] , 
+							'TGL_AKHIR_PENYEWAAN' => $row["TGL_AKHIR_PENYEWAAN"],
+							'TGL_PENGEMBALIAN' =>  null,
+							'HARGA_MOBIL' => $row["HARGA_MOBIL"],
+							'TOTAL' => $row["TOTAL"] ,
+							'STATUS_MOBIL' => 1 ,
+						);
+					$detail_pesanan[]=$temp;
+		}
+
+
 		
+		// KODE_TRANSAKSI
+		// $temp=$pesanan_data;
+		// $pesanan_data["BUKTI_PEMBAYARAN"]=$temp;
 
 		#Set response API if Success
-		$response['SUCCESS'] = array('status' => TRUE, 'message' => 'success insert data' , 'data' => $pesanan_data );
+		$response['SUCCESS'] = array('status' => TRUE, 'message' => 'success insert data' , 'data' => $pesanan_data);
 
 		#Set response API if Fail
 		$response['FAIL'] = array('status' => FALSE, 'message' => 'fail insert data' , 'data' => null );
@@ -103,7 +138,7 @@ class pesanan extends REST_Controller
 		$response['EXIST'] = array('status' => FALSE, 'message' => 'exist data' , 'data' => null );
 
 		#Check if insert pesanan_data Success
-		if ($this->m_pesanan->insert($pesanan_data)) {
+		if ($this->m_pesanan->insert($pesanan_data,$detail_pesanan)) {
 			
 			#If success
 			$this->response($response['SUCCESS'],REST_Controller::HTTP_CREATED);
