@@ -24,6 +24,19 @@ class m_pesanan extends CI_Model
 
 	}
 
+	function get_pesanan_by_userid($id){
+
+		#Get all data pesanan by userid
+		$this->db->select('*');
+		$this->db->from($this->table_name);
+		$this->db->where($this->table_name.".ID_USER",$id);
+		$data=$this->db->join($this->table_detail,$this->table_detail.".KODE_TRANSAKSI=".$this->table_name.".KODE_TRANSAKSI");
+		$data=$this->db->get();
+		return $data->result();
+
+
+	}
+
 	function get_by_id($id){
 
 		#Get data user by id
@@ -42,6 +55,16 @@ class m_pesanan extends CI_Model
 
 		return $data->result();
 	}
+
+	// function get_history_user($id){
+
+	// 	#Get history by id user
+	// 	$this->db->where("ID_USER",$id);
+	// 	$this->db->join($this->table_mobil." t_mobil","t_mobil.ID_MOBIL=".$this->table_detail.".ID_MOBIL");
+	// 	$data=$this->db->get($this->table_detail);
+
+	// 	return $data->result();
+	// }
 
 
 	function get_by_username_email($username,$email){		

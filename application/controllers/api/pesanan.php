@@ -17,12 +17,13 @@ class pesanan extends REST_Controller
 		$this->methods['index_post']['limit']=10; #10 requests per hour per pesanan/key
 		$this->methods['index_delete']['limit']=10; #10 requests per hour per pesanan/key
 		$this->methods['index_put']['limit']=10; #10 requests per hour per pesanan/key
+		$this->methods['history']['limit']=10; #10 requests per hour per pesanan/key
 		$this->load->helper('url');
 		#Configure load model api table pesanan
 		$this->load->model('m_pesanan');
 	}
 
-	function index_get($id=null){	
+	function index_get($id=null, $userid=null, $trid=null){	
 		// $as='[{"HARGA_MOBIL":"350000","ID_MOBIL":"2","MERK_MOBIL":"TOYOTA","NAMA_MOBIL":"Brio Satya E CVT","PLAT_NO_MOBIL":"D 0011 FZA","TGL_AKHIR_PENYEWAAN":"2017-11-29","TGL_SEWA":"2017-10-29","TOTAL":"11200000"},{"HARGA_MOBIL":"350000","ID_MOBIL":"15","MERK_MOBIL":"Datsun","NAMA_MOBIL":"Datsun Go","PLAT_NO_MOBIL":"D 1000 FX","TGL_AKHIR_PENYEWAAN":"2017-12-29","TGL_SEWA":"2017-10-29","TOTAL":"21700000"}]';
 		// foreach (json_decode($as,true) as $row) {
 		// 	echo $row["HARGA_MOBIL"];
@@ -31,6 +32,8 @@ class pesanan extends REST_Controller
 		// // var_dump();
 
 		// exit();
+		// var_dump($id == 'history'); die();
+
 		#Set response API if Success
 		$response['SUCCESS'] = array('status' => TRUE, 'message' => 'Success get pesanan' , 'data' => null );
 		
@@ -38,29 +41,91 @@ class pesanan extends REST_Controller
 		$response['NOT_FOUND']=array('status' => FALSE, 'message' => 'No pesanan were found' , 'data' => null );
         
 		#
+		if($id == 'history'){
+			if ($trid==null) {
+				#Call method get_all_by_userid from m_pesanan model
+				$pesanan=$this->m_pesanan->get_pesanan_by_userid($userid);
+			}else{
+				#Call method get_by_iduser from m_pesanan model
+				$pesanan=$this->m_pesanan->get_detail_by_id($trid);
+				// var_dump($pesanan);
+				// exit();
+			}
+		}else{
+			
+			if (!empty($this->get('KODE_TRANSAKSI')))
+				$id=$this->get('KODE_TRANSAKSI');
+	            
+
+			if ($id==null) {
+				#Call methode get_all from m_pesanan model
+				$pesanan=$this->m_pesanan->get_all();
+			
+			}else{
+				$id=str_replace("_", "-", $id);
+				#Check if id <= 0
+				// if ($id<=0) {
+				// 	$this->response($response['NOT_FOUND'], REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
+				// }
+
+				#Call methode get_by_id from m_pesanan model
+				$pesanan=$this->m_pesanan->get_detail_by_id($id);
+				// var_dump($pesanan);
+				// exit();
+			}
+		}
+			
+        # Check if the pesanan data store contains pesanan
+		if ($pesanan) {
+			// if (count($pesanan)==1)
+			// 	$pesanan->IMAGE=explode(',', $pesanan->IMAGE);
+			// else
+			// 	for ($i=0; $i <count($pesanan) ; $i++)
+			// 		$pesanan[$i]->IMAGE=explode(',', $pesanan[$i]->IMAGE);
+
+			$response['SUCCESS']['data']=$pesanan;
+
+			#if found pesanan
+			$this->response($response['SUCCESS'] , REST_Controller::HTTP_OK);
+
+		}else{
+
+	        #if Not found pesanan
+	        $this->response($response['NOT_FOUND'], REST_Controller::HTTP_NOT_FOUND); # NOT_FOUND (404) being the HTTP response code
+
+		}
+
+	}
+
+	// function history($userid, $id=null){
+	function history(){
+	 	var_dump("hello");die();	
+		#Set response API if Success
+		$response['SUCCESS'] = array('status' => TRUE, 'message' => 'Success get pesanan' , 'data' => null );
+		
+		#Set response API if Not Found
+		$response['NOT_FOUND']=array('status' => FALSE, 'message' => 'No pesanan were found' , 'data' => 10 );
+        
+		#
 		if (!empty($this->get('KODE_TRANSAKSI')))
 			$id=$this->get('KODE_TRANSAKSI');
             
+       
 
 		if ($id==null) {
-			#Call methode get_all from m_pesanan model
-			$pesanan=$this->m_pesanan->get_all();
+			#Call methode get_all_by_userid from m_pesanan model
+			$pesanan=$this->m_pesanan->get_pesanan_by_userid($userid);
 		
 		}
 
-		// var_dump($id);
-		// exit();
-		$id=str_replace("_", "-", $id);
-		// var_dump($id);
-		// exit();
 		if ($id!=null) {
 			#Check if id <= 0
 			// if ($id<=0) {
 			// 	$this->response($response['NOT_FOUND'], REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
 			// }
 
-			#Call methode get_by_id from m_pesanan model
-			$pesanan=$this->m_pesanan->get_detail_by_id($id);
+			#Call method get_by_iduser from m_pesanan model
+			$pesanan=$this->m_pesanan->get_history_user($id);
 			// var_dump($pesanan);
 			// exit();
 		}

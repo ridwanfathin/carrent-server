@@ -31,7 +31,8 @@ class Auth extends REST_Controller
 		
 		
 		$data_user=$this->m_auth->get_user_by_emai($this->post('EMAIL'),md5($this->post('PASSWORD')));
-		
+		// $data_user=$this->m_auth->get_user_by_emai('admin@gmail.com',md5('admin'));
+		// var_dump($this->post('EMAIL'),$this->post('PASSWORD')); die();
 		if ($data_user) {
 			$response['SUCCESS']['data']=$data_user;			
 			$this->response($response['SUCCESS'] , REST_Controller::HTTP_OK);
